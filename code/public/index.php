@@ -2,32 +2,41 @@
 
 require '../vendor/autoload.php';
 
+use App\Actions\CreateArtifact;
 use App\Application;
 use App\Shop;
 
 Application::init();
 
-$shop = new Shop();
+$pageName = 'list.php';
 
-?>
+if (isset($_GET['page'])) {
+    $requestedPage = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
 
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="utf-8">
-    <title>Legendary Artifacts Shop</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
+    if ($requestedPage == 'add-artifact') {
+        $pageName = 'add-item.php';
+    } elseif ($requestedPage == '404') {
+        $pageName = '404.php';
+    }
+}
 
-<body>
+if (isset($_GET['action'])) {
+    $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
 
-    <?= getHeader() ?>
+    if ($action == 'save-artifact') {
+        $dataToSave = $_REQUEST['artifact'];
+        $artifact = (new CreateArtifact)->execute($dataToSave);
+        (new Shop())->addNewItem($artifact);
 
-    <div class="artifacts-container">
-        <? foreach ($shop->getGoods() as $item) : ?>
-            <? renderCard($item); ?>
-        <? endforeach; ?>
-    </div>
+        header("Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}", true, 301);
+        exit();
+    }
+}
 
-</body>
-</html>
+$pagePath = VIEWS_PATH . "/pages/$pageName";
+
+if (file_exists($pagePath)) {
+    require_once VIEWS_PATH . '/layout/main.php';
+} else {
+    require VIEWS_PATH . '/pages/404.php';
+}

@@ -24,7 +24,7 @@ class Artifact
         $this->attributes = $data['attributes'] ?? '';
         $this->modifiers = $data['modifiers'] ?? '';
         $this->description = $data['flavour_text'] ?? '';
-        $this->imageUrl = $data['image_url'] ?? '';
+        $this->imageUrl = $data['image_url'] ?? 'assets/images/artifacts/no-image.png';
         $this->price = $data['price'] ?? '';
 
         return $this;
@@ -46,5 +46,23 @@ class Artifact
         }
 
         return $attHtml;
+    }
+
+    /**
+     * Array representation of an Artifact object
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'attributes' => $this->attributes,
+            'modifiers' => $this->modifiers,
+            'flavour_text' => $this->description,
+            'image_url' => $this->imageUrl,
+            'price' => $this->price,
+        ];
     }
 }
